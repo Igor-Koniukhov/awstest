@@ -2,33 +2,24 @@ package main
 
 import (
 	"fmt"
+	"github.com/subosito/gotenv"
 	"log"
-	"net"
 	"net/http"
+	"os"
 )
+
+func init() {
+	err := gotenv.Load()
+	if err != nil {
+		log.Println(err)
+	}
+}
 
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Handler worked - send IP.")
-
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, addr := range addrs {
-		var ip net.IP
-		switch v := addr.(type) {
-		case *net.IPNet:
-			ip = v.IP
-		case *net.IPAddr:
-			ip = v.IP
-		}
-
-		if ip != nil && ip.IsGlobalUnicast() {
-			fmt.Fprintf(w, "IP Address: %s", ip)
-		}
-	}
+	ip := os.Getenv("EC2")
+	fmt.Fprintf(w, "IP Address: %s", ip)
 
 }
 
